@@ -1,0 +1,20 @@
+# Ignore build output
+Debug/
+Release/
+*.o
+*.d
+*.elf
+*.bin
+*.hex
+*.map
+*.log
+
+# IDE settings
+.settings/
+*.launch
+.project
+.cproject
+
+# OS/system files
+.DS_Store
+Thumbs.db
