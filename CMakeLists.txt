@@ -37,6 +37,12 @@ message("Build type: " ${CMAKE_BUILD_TYPE})
 # Create an executable object type
 add_executable(${CMAKE_PROJECT_NAME})
 
+# Disable hardware FPU, use software floating point
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfloat-abi=soft")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfloat-abi=soft")
+set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} -mfloat-abi=soft")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mfloat-abi=soft")
+
 # Add STM32CubeMX generated sources
 add_subdirectory(cmake/stm32cubemx)
 
