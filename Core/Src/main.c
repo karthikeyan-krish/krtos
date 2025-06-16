@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "bsp.h"
+#include "krtos.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -54,6 +55,8 @@ static void MX_GPIO_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+uint32_t stack_blinky1[40];
+OSThread blinky1;
 void main_blinky1(){
   while(1){
     BSP_ledGreenOn();
@@ -63,6 +66,8 @@ void main_blinky1(){
   }
 }
 
+uint32_t stack_blinky2[40];
+OSThread blinky2;
 void main_blinky2(){
   while(1){
     BSP_ledBlueOn();
@@ -92,6 +97,7 @@ int main(void)
 
   /* USER CODE BEGIN Init */
   BSP_init();
+  OS_init();
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -109,6 +115,17 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
+  /* fabricate Cortex-M ISR stack frame for blinky1 */
+  OSThread_start(&blinky1,
+                  &main_blinky1,
+                  stack_blinky1, sizeof(stack_blinky1));
+
+  /* fabricate Cortex-M ISR stack frame for blinky2 */
+  OSThread_start(&blinky2,
+                  &main_blinky2,
+                  stack_blinky2, sizeof(stack_blinky2));
+
   while (1)
   {
     /* USER CODE END WHILE */

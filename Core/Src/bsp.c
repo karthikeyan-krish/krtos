@@ -1,6 +1,7 @@
 // Board Support Package (BSP) for the EK-TM4C123GXL board
 #include <stdint.h>
 #include "bsp.h"
+#include "krtos.h"
 #include "stm32l4xx_hal.h"
 
 // on-board led
@@ -11,6 +12,10 @@ static uint32_t volatile l_tickCtr;
 
 void SysTick_Handler(void) {
     ++l_tickCtr;
+
+    __disable_irq();
+    OS_sched();
+    __enable_irq();
 }
 
 uint32_t BSP_tickCtr(void) {
