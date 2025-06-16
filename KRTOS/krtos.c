@@ -54,3 +54,37 @@ void OSThread_start(
             *sp = 0xDEADBEEF;
     }
 }
+
+__attribute__((naked)) void PendSV_Handler(void) {
+
+     __asm volatile (
+         "cpsid   i\n"                      /*Disable interrupts*/
+         /*if(os_next != (osThread*)0)*/
+        "ldr     r3, =OS_curr\n"           /*Load address of OS_curr*/
+        "ldr     r3, [r3, #0]\n"           /*Load OS_curr into r3*/
+        "cbz     r3, save_context\n"       /*If OS_curr is null, skip saving context*/
+
+        /*push register r4-r11 on the stack*/
+        "push   {r4-r11}\n"
+        "ldr	r3, =OS_curr\n"            /*Load address of OS_curr*/
+        "ldr	r3, [r3, #0]\n"            /*Load OS_curr into r3*/
+        /*OS_curr->sp = sp;*/
+        "str	sp, [r3, #0]\n"            /*Save SP to OS_curr->sp*/
+
+        "save_context:\n"
+        /*sp = OS_next->sp;*/
+        "ldr     r3, =OS_next\n"           /*Load address of OS_next*/
+        "ldr     r3, [r3, #0]\n"           /*Load OS_next into r2*/
+        "ldr     sp, [r3, #0]\n"           /*Load OS_next->sp into SP*/
+
+        /*OS_curr = OS_next;*/
+        "ldr     r3, =OS_next\n"           /*Load address of OS_next*/
+        "ldr     r3, [r3, #0]\n"           /*Load OS_next into r2*/
+        "ldr     r2, =OS_curr\n"           /*Load address of OS_curr*/
+        "str     r3, [r2, #0]\n"           /*Load OS_curr into r2*/
+
+        "pop            {r4-r11}\n"
+        "cpsie   i\n"                      /*Enable interrupts*/
+        "bx      lr\n"                     /*Return from exception*/
+ );
+}
