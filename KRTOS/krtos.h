@@ -8,4 +8,9 @@ typedef struct {
 
 typedef void (*OSThreadHandler)();
 
+void OSThread_start(
+    OSThread *me,
+    OSThreadHandler threadHandler,
+    void *stkSto, uint32_t stkSize);
+
 #endif /*KRTOS_H*/
