@@ -5,6 +5,11 @@
 OSThread * volatile OS_curr;
 OSThread * volatile OS_next;
 
+void OS_init(void) {
+    /* set the PendSV interrupt priority to the lowest level 0xFF */
+    *(uint32_t volatile *)0xE000ED20 |= (0xFFU << 16);
+}
+
 void OS_sched(void){
     if(OS_next != OS_curr){
             /* trigger PendSV exception */

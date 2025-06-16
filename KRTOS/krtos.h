@@ -8,6 +8,8 @@ typedef struct {
 
 typedef void (*OSThreadHandler)();
 
+void OS_init(void);
+
 /* this function must be called with interrupts disabled */
 void OS_sched(void);
 
