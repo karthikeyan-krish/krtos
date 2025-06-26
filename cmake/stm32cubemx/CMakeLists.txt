@@ -18,7 +18,6 @@ target_include_directories(stm32cubemx INTERFACE
     ../../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy
     ../../Drivers/CMSIS/Device/ST/STM32L4xx/Include
     ../../Drivers/CMSIS/Include
-    ../../KRTOS
 )
 
 target_sources(stm32cubemx INTERFACE
@@ -45,7 +44,6 @@ target_sources(stm32cubemx INTERFACE
     ../../Core/Src/sysmem.c
     ../../Core/Src/syscalls.c
     ../../startup_stm32l475xx.s
-    ../../KRTOS/krtos.c
 )
 
 target_link_directories(stm32cubemx INTERFACE
