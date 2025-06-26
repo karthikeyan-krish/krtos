@@ -79,6 +79,8 @@ void main_blinky2(){
   }
 }
 
+uint32_t stack_idleThread[40];
+
 /* USER CODE END 0 */
 
 /**
@@ -99,7 +101,7 @@ int main(void)
 
   /* USER CODE BEGIN Init */
   BSP_init();
-  OS_init();
+  OS_init(stack_idleThread, sizeof(stack_idleThread));
   /* USER CODE END Init */
 
   /* Configure the system clock */
