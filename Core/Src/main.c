@@ -116,7 +116,6 @@ int main(void)
   /* USER CODE END 2 */
 
   /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
 
   /* fabricate Cortex-M ISR stack frame for blinky1 */
   OSThread_start(&blinky1,
@@ -128,13 +127,8 @@ int main(void)
                   &main_blinky2,
                   stack_blinky2, sizeof(stack_blinky2));
 
-  while (1)
-  {
-    /* USER CODE END WHILE */
+OS_run();
 
-    /* USER CODE BEGIN 3 */
-  }
-  /* USER CODE END 3 */
 }
 
 /**
