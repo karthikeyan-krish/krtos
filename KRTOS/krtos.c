@@ -14,9 +14,22 @@ uint32_t OS_delayedSet; /* bitmask of threads that are delayed */
 
 #define LOG2(x) (32U - __builtin_clz(x))
 
-void OS_init(void) {
+OSThread idleThread;
+void main_idleThread() {
+    while (1) {
+        OS_onIdle();
+    }
+}
+
+void OS_init(void *stkSto, uint32_t stkSize) {
     /* set the PendSV interrupt priority to the lowest level 0xFF */
     *(uint32_t volatile *)0xE000ED20 |= (0xFFU << 16);
+
+    /* start idleThread thread */
+    OSThread_start(&idleThread,
+                    0U,
+                    &main_idleThread,
+                    stkSto, stkSize);
 }
 
 void OS_sched(void){

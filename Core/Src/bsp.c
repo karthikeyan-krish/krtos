@@ -76,6 +76,8 @@ void OS_onStartup(void){
     NVIC_SetPriority(SysTick_IRQn, 0);
 }
 
+void OS_onIdle(void){
+    //__WFI(); // wait for interrupt
 }
 
 void Q_onAssert(char const *module, int id) {

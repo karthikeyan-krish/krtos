@@ -10,7 +10,9 @@ typedef struct {
 
 typedef void (*OSThreadHandler)();
 
-void OS_init(void);
+void OS_init(void *stkSto, uint32_t stkSize);
+
+void OS_onIdle(void);
 
 /* this function must be called with interrupts disabled */
 void OS_sched(void);
