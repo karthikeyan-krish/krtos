@@ -59,10 +59,11 @@ uint32_t stack_blinky1[40];
 OSThread blinky1;
 void main_blinky1(){
   while(1){
-    BSP_ledGreenOn();
-    BSP_delay(BSP_TICKS_PER_SEC / 4U);
-    BSP_ledGreenOff();
-    BSP_delay(BSP_TICKS_PER_SEC * 3U / 4U);
+    for(uint32_t i = 0U; i < 1500U; ++i) {
+          BSP_ledGreenOn();
+          BSP_ledGreenOff();
+    }
+    OS_delay(1U);
   }
 }
 
@@ -70,10 +71,11 @@ uint32_t stack_blinky2[40];
 OSThread blinky2;
 void main_blinky2(){
   while(1){
-    BSP_ledBlueOn();
-    BSP_delay(BSP_TICKS_PER_SEC / 4U);
-    BSP_ledBlueOff();
-    BSP_delay(BSP_TICKS_PER_SEC * 3U / 4U);
+    for(uint32_t i = 0U; i < 3*1500U; ++i) {
+          BSP_ledBlueOn();
+          BSP_ledBlueOff();
+    }
+    OS_delay(50U);
   }
 }
 
