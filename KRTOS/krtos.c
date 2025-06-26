@@ -3,7 +3,6 @@
 #include "qassert.h"
 
 Q_DEFINE_THIS_FILE
-#include "stm32l4xx_hal.h"
 
 OSThread * volatile OS_curr;
 OSThread * volatile OS_next;
@@ -37,6 +36,38 @@ void OS_sched(void){
             /* trigger PendSV exception */
             *(uint32_t volatile *)0xE000ED04 = (1U << 28);
     }
+}
+
+void OS_tick(void) {
+    uint32_t workingSet = OS_delayedSet;
+    while (workingSet != 0U) {
+        OSThread *t = OS_thread[LOG2(workingSet)];
+        uint32_t bit;
+        Q_ASSERT((t != (OSThread *)0) && (t->timeout != 0U));
+
+        bit = (1U << (t->prio - 1U));
+        --t->timeout;
+        if (t->timeout == 0U) {
+            OS_readySet   |= bit;  /* insert to ready set */
+            OS_delayedSet &= ~bit; /* remove from delayed/waiting/blocked set */
+        }
+        workingSet &= ~bit; /* remove from delayed/waiting/blocked set */
+    }
+}
+
+void OS_delay(uint32_t ticks) {
+    uint32_t bit;
+    __asm volatile ("cpsid i");
+
+    /* never call OS_delay from the idleThread */
+    Q_REQUIRE(OS_curr != OS_thread[0]);
+
+    OS_curr->timeout = ticks;
+    bit = (1U << (OS_curr->prio - 1U));
+    OS_readySet &= ~bit;
+    OS_delayedSet |= bit;
+    OS_sched();
+    __asm volatile ("cpsie i");
 }
 
 void OSThread_start(
