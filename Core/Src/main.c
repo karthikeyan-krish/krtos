@@ -22,7 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "bsp.h"
-#include "krtos.h"
+#include "qpc.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,30 +56,28 @@ static void MX_GPIO_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 uint32_t stack_blinky1[40];
-OSThread blinky1;
-void main_blinky1(){
+QXThread blinky1;
+void main_blinky1(QXThread * const me) {
   while(1){
     for(uint32_t i = 0U; i < 1500U; ++i) {
           BSP_ledGreenOn();
           BSP_ledGreenOff();
     }
-    OS_delay(1U);
+    QXThread_delay(1U);
   }
 }
 
 uint32_t stack_blinky2[40];
-OSThread blinky2;
-void main_blinky2(){
+QXThread blinky2;
+void main_blinky2(QXThread * const me){
   while(1){
     for(uint32_t i = 0U; i < 3*1500U; ++i) {
           BSP_ledBlueOn();
           BSP_ledBlueOff();
     }
-    OS_delay(50U);
+    QXThread_delay(50U);
   }
 }
-
-uint32_t stack_idleThread[40];
 
 /* USER CODE END 0 */
 
@@ -101,7 +99,7 @@ int main(void)
 
   /* USER CODE BEGIN Init */
   BSP_init();
-  OS_init(stack_idleThread, sizeof(stack_idleThread));
+  QF_init();
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -120,18 +118,22 @@ int main(void)
   /* Infinite loop */
 
   /* fabricate Cortex-M ISR stack frame for blinky1 */
-  OSThread_start(&blinky1,
+  QXThread_ctor(&blinky1, &main_blinky1, 0U);
+  QXTHREAD_START(&blinky1,
                   5U,
-                  &main_blinky1,
-                  stack_blinky1, sizeof(stack_blinky1));
+                  (void *)0, 0,
+                  stack_blinky1, sizeof(stack_blinky1),
+                  (void *)0);
 
   /* fabricate Cortex-M ISR stack frame for blinky2 */
-  OSThread_start(&blinky2,
+  QXThread_ctor(&blinky2, &main_blinky2, 0U);
+  QXTHREAD_START(&blinky2,
                   2U,
-                  &main_blinky2,
-                  stack_blinky2, sizeof(stack_blinky2));
+                  (void *)0, 0,
+                  stack_blinky2, sizeof(stack_blinky2),
+                  (void *)0);
 
-OS_run();
+QF_run();
 
 }
 

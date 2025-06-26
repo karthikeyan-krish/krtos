@@ -1,7 +1,7 @@
 // Board Support Package (BSP) for the EK-TM4C123GXL board
 #include <stdint.h>
 #include "bsp.h"
-#include "krtos.h"
+#include "qpc.h"
 #include "stm32l4xx_hal.h"
 
 // on-board led
@@ -12,11 +12,11 @@
 static uint32_t volatile l_tickCtr;
 
 void SysTick_Handler(void) {
-    OS_tick();
+    QXK_ISR_ENTRY();
 
-    __disable_irq();
-    OS_sched();
-    __enable_irq();
+    QF_TICK_X(0U, (void *)0); /* process time events for rate 0 */
+
+    QXK_ISR_EXIT();
 }
 
 void BSP_init(void) {
@@ -59,14 +59,18 @@ void BSP_ledBlueOn(void) {
 	GPIOC->BSRR |= (1U << (LED_BLUE + 16));
 }
 
-void OS_onStartup(void){
+void QF_onStartup(void){
     SystemCoreClockUpdate();
     SysTick_Config(SystemCoreClock / BSP_TICKS_PER_SEC);
 
-    NVIC_SetPriority(SysTick_IRQn, 0);
+    NVIC_SetPriority(SysTick_IRQn, QF_AWARE_ISR_CMSIS_PRI);
 }
 
-void OS_onIdle(void){
+void QF_onCleanup(void) {
+    // nothing to do
+}
+
+void QXK_onIdle(void){
     //__WFI(); // wait for interrupt
 }
 
