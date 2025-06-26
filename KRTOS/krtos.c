@@ -1,5 +1,8 @@
 #include <stdint.h>
 #include "krtos.h"
+#include "qassert.h"
+
+Q_DEFINE_THIS_FILE
 #include "stm32l4xx_hal.h"
 
 OSThread * volatile OS_curr;
@@ -30,6 +33,9 @@ void OSThread_start(
     void *stkSto, uint32_t stkSize) {
     uint32_t *sp = (uint32_t *)((((uint32_t)stkSto + stkSize) / 8) * 8);
     uint32_t *stk_limit;
+
+    Q_REQUIRE((prio < Q_DIM(OS_thread))
+        && (OS_thread[prio] == (OSThread *)0));
 
     /* custom context switching stack */
     *(--sp) = (1U << 24);  /* xPSR */

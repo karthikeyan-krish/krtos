@@ -71,4 +71,9 @@ void BSP_ledBlueOff(void) {
 
 void BSP_ledBlueOn(void) {
 	GPIOC->BSRR |= (1U << (LED_BLUE + 16));
+void Q_onAssert(char const *module, int id) {
+    /* TBD: damage control */
+    (void)module; /* avoid the "unused parameter" compiler warning */
+    (void)id;     /* avoid the "unused parameter" compiler warning */
+    NVIC_SystemReset();
 }
