@@ -48,13 +48,9 @@ void BSP_init(void) {
     GPIOC->OTYPER |= ~(1U << 9);                // Configure pin 9 as push-pull output
     GPIOC->OSPEEDR |= (1U << 19);               // Set pin 9 to high-speed mode
     GPIOC->PUPDR |= ~((1U << 18) | (1U << 19)); // Disable pull-up and pull-down resistors for pin 9
+}
 
-    SystemCoreClockUpdate();
-    SysTick_Config(SystemCoreClock / BSP_TICKS_PER_SEC);
 
-    NVIC_SetPriority(SysTick_IRQn, 0U);
-
-    __enable_irq();
 }
 
 void BSP_ledGreenOn(void) {
@@ -71,6 +67,17 @@ void BSP_ledBlueOff(void) {
 
 void BSP_ledBlueOn(void) {
 	GPIOC->BSRR |= (1U << (LED_BLUE + 16));
+}
+
+void OS_onStartup(void){
+    SystemCoreClockUpdate();
+    SysTick_Config(SystemCoreClock / BSP_TICKS_PER_SEC);
+
+    NVIC_SetPriority(SysTick_IRQn, 0);
+}
+
+}
+
 void Q_onAssert(char const *module, int id) {
     /* TBD: damage control */
     (void)module; /* avoid the "unused parameter" compiler warning */

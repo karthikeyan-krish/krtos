@@ -15,6 +15,9 @@ void OS_init(void);
 /* this function must be called with interrupts disabled */
 void OS_sched(void);
 
+/* callback to configure and start interrupts */
+void OS_onStartup(void);
+
 void OSThread_start(
     OSThread *me,
     uint8_t prio,
