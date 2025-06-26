@@ -5,6 +5,12 @@
 OSThread * volatile OS_curr;
 OSThread * volatile OS_next;
 
+OSThread * OS_thread[32+1]; /* Array to hold thread pointers, size is 32+1 for 0-based indexing */
+uint32_t OS_readySet; /* bitmask of threads that are ready to run */
+uint32_t OS_delayedSet; /* bitmask of threads that are delayed */
+
+#define LOG2(x) (32U - __builtin_clz(x))
+
 void OS_init(void) {
     /* set the PendSV interrupt priority to the lowest level 0xFF */
     *(uint32_t volatile *)0xE000ED20 |= (0xFFU << 16);
@@ -19,6 +25,7 @@ void OS_sched(void){
 
 void OSThread_start(
     OSThread *me,
+    uint8_t prio,
     OSThreadHandler threadHandler,
     void *stkSto, uint32_t stkSize) {
     uint32_t *sp = (uint32_t *)((((uint32_t)stkSto + stkSize) / 8) * 8);
@@ -52,6 +59,13 @@ void OSThread_start(
     /* pre fill the unused part of the stack with 0xDEADBEEF */
     for(sp = sp - 1U; sp >= stk_limit; --sp){
             *sp = 0xDEADBEEF;
+    }
+
+    /* register the thread with the OS */
+    OS_thread[prio] = me;
+    /* make the thread ready to run */
+    if (prio > 0U) {
+        OS_readySet |= (1U << (prio - 1U));
     }
 }
 
