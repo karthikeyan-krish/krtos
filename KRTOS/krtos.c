@@ -32,6 +32,15 @@ void OS_init(void *stkSto, uint32_t stkSize) {
 }
 
 void OS_sched(void){
+    /* OS_next = ... */
+    if (OS_readySet == 0U) { /* idle condition? */
+        OS_next = OS_thread[0]; /* the idle thread */
+    }
+    else {
+        OS_next = OS_thread[LOG2(OS_readySet)];
+        Q_ASSERT(OS_next != (OSThread *)0);
+    }
+
     if(OS_next != OS_curr){
             /* trigger PendSV exception */
             *(uint32_t volatile *)0xE000ED04 = (1U << 28);
