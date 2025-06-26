@@ -5,6 +5,7 @@
 #include "stm32l4xx_hal.h"
 
 // on-board led
+#define LED_RED 13
 #define LED_GREEN 14
 #define LED_BLUE 9
 
@@ -34,7 +35,12 @@ void BSP_init(void) {
     GPIOC->PUPDR |= ~((1U << 18) | (1U << 19)); // Disable pull-up and pull-down resistors for pin 9
 }
 
+void BSP_ledRedOn(void) {
+    GPIOB->BSRR |= (1U << LED_RED);
+}
 
+void BSP_ledRedOff(void) {
+	GPIOB->BSRR |= (1U << (LED_RED + 16));
 }
 
 void BSP_ledGreenOn(void) {
