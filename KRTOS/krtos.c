@@ -38,6 +38,18 @@ void OS_sched(void){
     }
 }
 
+void OS_run(void) {
+    /* callback to configure and start interrupts */
+    OS_onStartup();
+
+    __asm volatile ("cpsid i");
+    OS_sched();
+    __asm volatile ("cpsie i");
+
+    /* the following code should never execute */
+    Q_ERROR();
+}
+
 void OS_tick(void) {
     uint32_t workingSet = OS_delayedSet;
     while (workingSet != 0U) {

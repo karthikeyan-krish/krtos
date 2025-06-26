@@ -17,11 +17,15 @@ void OS_onIdle(void);
 /* this function must be called with interrupts disabled */
 void OS_sched(void);
 
+/* transfer control to the RTOS to run the threads */
+void OS_run(void);
+
 /* non blocking delay that block only the running thread */
 void OS_delay(uint32_t ticks);
 
 /* process timeouts */
 void OS_tick(void);
+
 /* callback to configure and start interrupts */
 void OS_onStartup(void);
 
