@@ -70,11 +70,12 @@ uint32_t stack_blinky2[40];
 QXThread blinky2;
 void main_blinky2(QXThread * const me){
   while(1){
+    QXSemaphore_wait(&SW1_sema,  /* pointer to semaphore to wait on */
+                  QXTHREAD_NO_TIMEOUT); /* timeout for waiting */
     for(uint32_t i = 0U; i < 3*1500U; ++i) {
           BSP_ledBlueOn();
           BSP_ledBlueOff();
     }
-    QXThread_delay(50U);
   }
 }
 
@@ -114,6 +115,11 @@ int main(void)
 
   /* Infinite loop */
 
+  /* initialize the SW1_sema semaphore as binary, signaling semaphore */
+  QXSemaphore_init(&SW1_sema, /* pointer to semaphore to initialize */
+                  0U,  /* initial semaphore count (singaling semaphore) */
+                  1U); /* maximum semaphore count (binary semaphore) */
+
   /* fabricate Cortex-M ISR stack frame for blinky1 */
   QXThread_ctor(&blinky1, &main_blinky1, 0U);
   QXTHREAD_START(&blinky1,
@@ -130,7 +136,5 @@ int main(void)
                   stack_blinky2, sizeof(stack_blinky2),
                   (void *)0);
 
-QF_run();
-
+  QF_run();
 }
-  QF_run();
