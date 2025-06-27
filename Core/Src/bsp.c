@@ -8,6 +8,7 @@
 #define LED_RED 13
 #define LED_GREEN 14
 #define LED_BLUE 9
+#define B2_PIN 13
 
 static uint32_t volatile l_tickCtr;
 
@@ -17,6 +18,24 @@ void SysTick_Handler(void) {
     QF_TICK_X(0U, (void *)0); /* process time events for rate 0 */
 
     QXK_ISR_EXIT();
+}
+
+void EXTI15_10_IRQHandler(void); // prototype
+void EXTI15_10_IRQHandler(void) {
+    QXK_ISR_ENTRY();  /* inform QXK about entering an ISR */
+
+    /* falling edge? */
+    if ((EXTI->PR1 & (1U << B2_PIN)) != 0U) {
+        bool pin_low = (GPIOC->IDR & (1U << B2_PIN)) == 0; // to fix electrical or mechanical bounce
+
+        if (pin_low) {
+            QXSemaphore_signal(&SW1_sema);
+        }
+
+        EXTI->PR1 = (1U << B2_PIN); // Clear pending
+    }
+
+    QXK_ISR_EXIT(); /* inform QXK about exiting an ISR */
 }
 
 void BSP_init(void) {
@@ -34,6 +53,20 @@ void BSP_init(void) {
     GPIOC->OSPEEDR |= (1U << ((LED_BLUE * 2)+1));                               // Set pin 9 to high-speed mode
     GPIOC->PUPDR |= ~((1U << (LED_BLUE * 2)) | (1U << ((LED_BLUE * 2)+1)));     // Disable pull-up and pull-down resistors for pin 9
 
+    GPIOC->MODER   &= ~(3U << 2*B2_PIN);                                        // configure Button B1 (PC.13) pins as input
+    GPIOC->PUPDR   &= ~(3U << 2*B2_PIN);                                        // Clear
+    GPIOC->PUPDR   |=  (1U << 2*B2_PIN);                                        // Pull-up
+
+    SYSCFG->EXTICR[3] &= ~(0xF << (1 * 4));                                     // Clear EXTI13 bits
+    SYSCFG->EXTICR[3] |=  (2 << (1 * 4));                                       // Set EXTI13 to Port C (2 is GPIOC)
+
+    EXTI->PR1 = (1U << B2_PIN);                                                 // Clear pending bit for EXTI line 13
+
+    EXTI->RTSR1 &= ~(1U << B2_PIN);                                             // disable rising edge trigger
+    EXTI->FTSR1 &= ~(1U << B2_PIN);                                             // disable falling edge trigger
+    EXTI->FTSR1 |= (1U << B2_PIN);                                              // configure falling edge trigger
+
+    EXTI->IMR1 |= (1U << B2_PIN);                                               // configure Button B1 interrupt as falling edge
 }
 
 void BSP_ledRedOn(void) {
@@ -65,6 +98,9 @@ void QF_onStartup(void){
     SysTick_Config(SystemCoreClock / BSP_TICKS_PER_SEC);
 
     NVIC_SetPriority(SysTick_IRQn, QF_AWARE_ISR_CMSIS_PRI);
+    NVIC_SetPriority(EXTI15_10_IRQn, QF_AWARE_ISR_CMSIS_PRI + 1U);
+
+    NVIC_EnableIRQ(EXTI15_10_IRQn);
 }
 
 void QF_onCleanup(void) {
