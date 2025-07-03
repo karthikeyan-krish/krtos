@@ -83,6 +83,10 @@ void BSP_ledBlueOn(void) {
 	GPIOC->BSRR |= (1U << (LED_BLUE + 16));
 }
 
+void BSP_ledGreenToggle(void) {
+	GPIOB->ODR ^= (1U << LED_GREEN);
+}
+
 void QF_onStartup(void){
     SystemCoreClockUpdate();
     SysTick_Config(SystemCoreClock / BSP_TICKS_PER_SEC);

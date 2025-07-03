@@ -14,6 +14,8 @@ void BSP_ledBlueOff(void);
 void BSP_ledGreenOn(void);
 void BSP_ledGreenOff(void);
 
+void BSP_ledGreenToggle(void);
+
 extern QXSemaphore SW1_sema;
 
 #endif // __BSP_H__
