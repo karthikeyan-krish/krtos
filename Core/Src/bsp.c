@@ -93,6 +93,27 @@ void BSP_ledGreenToggle(void) {
     QF_CRIT_EXIT(); // exit critical section
 }
 
+void BSP_sendMorseCode(uint32_t bitmask) {
+    uint32_t volatile delay_ctr;
+    enum { DOT_DELAY = 150 };
+
+    for (; bitmask != 0U; bitmask <<= 1) {
+        if ((bitmask & (1U << 31)) != 0U) {
+            BSP_ledGreenOn();
+        }
+        else {
+            BSP_ledGreenOff();
+        }
+        for (delay_ctr = DOT_DELAY;
+             delay_ctr != 0U; --delay_ctr) {
+        }
+    }
+    BSP_ledGreenOff();
+    for (delay_ctr = 7*DOT_DELAY;
+         delay_ctr != 0U; --delay_ctr) {
+    }
+}
+
 void QF_onStartup(void){
     SystemCoreClockUpdate();
     SysTick_Config(SystemCoreClock / BSP_TICKS_PER_SEC);

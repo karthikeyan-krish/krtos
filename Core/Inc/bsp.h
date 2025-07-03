@@ -18,4 +18,6 @@ void BSP_ledGreenToggle(void);
 
 extern QXSemaphore SW1_sema;
 
+void BSP_sendMorseCode(uint32_t bitmask);
+
 #endif // __BSP_H__

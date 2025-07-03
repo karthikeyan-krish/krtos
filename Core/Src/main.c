@@ -58,11 +58,10 @@ uint32_t stack_blinky1[40];
 QXThread blinky1;
 void main_blinky1(QXThread * const me) {
   while(1){
-    for(uint32_t i = 0U; i < 1500U; ++i) {
-          BSP_ledGreenOn();
-          BSP_ledGreenOff();
+    for(uint32_t i = 0U; i < 1900U + 1U; ++i) {
+        BSP_sendMorseCode(0xA8EEE2A0U); /* "SOS" */
+        QXThread_delay(1U); /* block for 1 tick */
     }
-    QXThread_delay(1U);
   }
 }
 
@@ -73,10 +72,20 @@ void main_blinky2(QXThread * const me){
     QXSemaphore_wait(&SW1_sema,  /* pointer to semaphore to wait on */
                   QXTHREAD_NO_TIMEOUT); /* timeout for waiting */
     for(uint32_t i = 0U; i < 3*1500U; ++i) {
-          BSP_ledBlueOn();
-          BSP_ledBlueOff();
+          // BSP_ledBlueOn();
+          // BSP_ledBlueOff();
     }
   }
+}
+
+uint32_t stack_blinky3[40];
+QXThread blinky3;
+void main_blinky3(QXThread * const me) {
+    while (1) {
+        BSP_sendMorseCode(0xE22A3800U); /* "TEST" */
+        BSP_sendMorseCode(0xE22A3800U); /* "TEST" */
+        QXThread_delay(5U);
+    }
 }
 
 /* USER CODE END 0 */
@@ -135,6 +144,14 @@ int main(void)
                   (void *)0, 0,
                   stack_blinky2, sizeof(stack_blinky2),
                   (void *)0);
+
+    /* initialize and start blinky3 thread */
+    QXThread_ctor(&blinky3, &main_blinky3, 0);
+    QXTHREAD_START(&blinky3,
+                   1U, /* priority */
+                   (void *)0, 0, /* message queue (not used) */
+                   stack_blinky3, sizeof(stack_blinky3), /* stack */
+                   (void *)0); /* extra parameter (not used) */
 
   QF_run();
 }
