@@ -11,6 +11,8 @@
 //SEMA
 static QXSemaphore Morse_sema;
 
+//MUTEX
+static QXMutex Morse_mutex;
 
 void SysTick_Handler(void) {
     QXK_ISR_ENTRY();
@@ -70,6 +72,8 @@ void BSP_init(void) {
 
     EXTI->IMR1 |= (1U << B2_PIN);                                               // configure Button B1 interrupt as falling edge
 
+    //MUTEX
+    QXMutex_init(&Morse_mutex, 6U); /* priority ceiling 6 */
 }
 
 void BSP_ledGreenOn(void) {
@@ -100,12 +104,19 @@ void BSP_sendMorseCode(uint32_t bitmask) {
     uint32_t volatile delay_ctr;
     enum { DOT_DELAY = 150 };
 
+    //LOCK
+    QSchedStatus sstat;
+
     //SEMA
     QXSemaphore_wait(&Morse_sema,  /* pointer to semaphore to wait on */
                     QXTHREAD_NO_TIMEOUT); /* timeout for waiting */
 
     //LOCK
     sstat = QXK_schedLock(5U); /* priority ceiling 5 */
+
+    //MUTEX
+    QXMutex_lock(&Morse_mutex,
+                 QXTHREAD_NO_TIMEOUT); /* timeout for waiting */
 
     for (; bitmask != 0U; bitmask <<= 1) {
         if ((bitmask & (1U << 31)) != 0U) {
@@ -129,6 +140,8 @@ void BSP_sendMorseCode(uint32_t bitmask) {
     //LOCK
     QXK_schedUnlock(sstat);
 
+    //MUTEX
+    QXMutex_unlock(&Morse_mutex);
 }
 
 void QF_onStartup(void){

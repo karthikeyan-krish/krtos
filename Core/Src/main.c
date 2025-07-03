@@ -106,8 +106,8 @@ int main(void)
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
 
   /* USER CODE BEGIN Init */
-  BSP_init();
   QF_init();
+  BSP_init();
   /* USER CODE END Init */
 
   /* Configure the system clock */
