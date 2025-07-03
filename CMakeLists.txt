@@ -37,6 +37,12 @@ message("Build type: " ${CMAKE_BUILD_TYPE})
 # Create an executable object type
 add_executable(${CMAKE_PROJECT_NAME})
 
+# Disable hardware FPU, use software floating point
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfloat-abi=soft")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfloat-abi=soft")
+set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} -mfloat-abi=soft")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mfloat-abi=soft")
+
 # Add STM32CubeMX generated sources
 add_subdirectory(cmake/stm32cubemx)
 
@@ -44,7 +50,36 @@ add_subdirectory(cmake/stm32cubemx)
 set(QP_PORT "arm-cm")
 
 # Add QP/C framework
-add_subdirectory(lib/qpc)
+# Create QPC static library
+add_library(qpc STATIC
+    lib/qpc/src/qf/qep_hsm.c
+    lib/qpc/src/qf/qep_msm.c
+    lib/qpc/src/qf/qf_act.c
+    lib/qpc/src/qf/qf_actq.c
+    lib/qpc/src/qf/qf_defer.c
+    lib/qpc/src/qf/qf_dyn.c
+    lib/qpc/src/qf/qf_mem.c
+    lib/qpc/src/qf/qf_ps.c
+    lib/qpc/src/qf/qf_qact.c
+    lib/qpc/src/qf/qf_qeq.c
+    lib/qpc/src/qf/qf_qmact.c
+    lib/qpc/src/qf/qf_time.c
+
+    lib/qpc/ports/arm-cm/qxk/gnu/qxk_port.c
+
+    # Include qxk only if you're using it:
+    lib/qpc/src/qxk/qxk.c
+    lib/qpc/src/qxk/qxk_mutex.c
+    lib/qpc/src/qxk/qxk_sema.c
+    lib/qpc/src/qxk/qxk_xthr.c
+)
+
+target_include_directories(qpc PUBLIC
+    ${CMAKE_SOURCE_DIR}/lib/qpc/include
+    ${CMAKE_SOURCE_DIR}/lib/qpc/src
+    ${CMAKE_SOURCE_DIR}/lib/qpc/ports/arm-cm/qxk/gnu  # if using ARM-CM port
+)
+
 
 # Link directories setup
 target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE

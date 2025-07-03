@@ -1,20 +1,44 @@
-# Ignore build output
+# STM32CubeMX output
+*.ioc
+
+# Build directories (for multi-config generators like CMake)
+build/
+Build/
 Debug/
 Release/
+**/Debug/
+**/Release/
+
+# Object & dependency files
 *.o
+*.obj
 *.d
+
+# Executables and binaries
 *.elf
 *.bin
 *.hex
 *.map
+*.lst
+*.out
+
+# Logs
 *.log
 
-# IDE settings
-.settings/
-*.launch
-.project
-.cproject
+# CMake generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
 
-# OS/system files
+# QP/C or QXK auto-generated state machine headers (optional)
+*_fsm.h
+*_fsm.c
+
+# VSCode / JetBrains project settings
+.vscode/
+.idea/
+
+# MacOS / Windows specific
 .DS_Store
 Thumbs.db
