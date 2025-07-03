@@ -104,6 +104,9 @@ void BSP_sendMorseCode(uint32_t bitmask) {
     QXSemaphore_wait(&Morse_sema,  /* pointer to semaphore to wait on */
                     QXTHREAD_NO_TIMEOUT); /* timeout for waiting */
 
+    //LOCK
+    sstat = QXK_schedLock(5U); /* priority ceiling 5 */
+
     for (; bitmask != 0U; bitmask <<= 1) {
         if ((bitmask & (1U << 31)) != 0U) {
             BSP_ledGreenOn();
@@ -122,6 +125,9 @@ void BSP_sendMorseCode(uint32_t bitmask) {
 
     //SEMA
     QXSemaphore_signal(&Morse_sema);  /* pointer to semaphore to signal */
+
+    //LOCK
+    QXK_schedUnlock(sstat);
 
 }
 
