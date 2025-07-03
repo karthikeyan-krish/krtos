@@ -40,15 +40,17 @@ void BSP_init(void) {
 
     GPIOB->MODER &= ~(3U << (LED_GREEN * 2));                                   // Clear mode bits for pin 14 (set as input by default)
     GPIOB->MODER |= (1U << (LED_GREEN * 2));                                    // Set pin 14 as general-purpose output mode
-    GPIOB->OTYPER |= ~(1U << LED_GREEN);                                        // Configure pin 14 as push-pull output
+    GPIOB->OTYPER &= ~(1U << LED_GREEN);                                        // Configure pin 14 as push-pull output
     GPIOB->OSPEEDR |= (1U << ((LED_GREEN * 2)+1));                              // Set pin 14 to high-speed mode
-    GPIOB->PUPDR |= ~((1U << (LED_GREEN * 2)) | (1U << ((LED_GREEN * 2)+1)));   // Disable pull-up and pull-down resistors for pin 14
+    GPIOB->PUPDR &= ~(3U << (2 * LED_GREEN));                                   // Clear
+    GPIOB->PUPDR |=  (1U << (2 * LED_GREEN));                                   // Disable pull-up and pull-down resistors for pin 14
 
     GPIOC->MODER &= ~(3U << (LED_BLUE * 2));                                    // Clear mode bits for pin 9 (set as input by default)
     GPIOC->MODER |= (1U << (LED_BLUE * 2));                                     // Set pin 9 as general-purpose output mode
-    GPIOC->OTYPER |= ~(1U << LED_BLUE);                                         // Configure pin 9 as push-pull output
+    GPIOC->OTYPER &= ~(1U << LED_BLUE);                                         // Configure pin 9 as push-pull output
     GPIOC->OSPEEDR |= (1U << ((LED_BLUE * 2)+1));                               // Set pin 9 to high-speed mode
-    GPIOC->PUPDR |= ~((1U << (LED_BLUE * 2)) | (1U << ((LED_BLUE * 2)+1)));     // Disable pull-up and pull-down resistors for pin 9
+    GPIOB->PUPDR &= ~(3U << (2 * LED_BLUE));                                    // Clear
+    GPIOB->PUPDR |=  (1U << (2 * LED_BLUE));                                    // Disable pull-up and pull-down resistors for pin 9
 
     GPIOC->MODER   &= ~(3U << 2*B2_PIN);                                        // configure Button B1 (PC.13) pins as input
     GPIOC->PUPDR   &= ~(3U << 2*B2_PIN);                                        // Clear
