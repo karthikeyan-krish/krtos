@@ -8,9 +8,6 @@
 void BSP_init(void);
 
 // led control functions
-void BSP_ledRedOn(void);
-void BSP_ledRedOff(void);
-
 void BSP_ledBlueOn(void);
 void BSP_ledBlueOff(void);
 

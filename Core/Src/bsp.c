@@ -4,12 +4,10 @@
 #include "stm32l4xx_hal.h"
 
 // on-board led
-#define LED_RED 13
 #define LED_GREEN 14
 #define LED_BLUE 9
 #define B2_PIN 13
 
-static uint32_t volatile l_tickCtr;
 
 void SysTick_Handler(void) {
     QXK_ISR_ENTRY();
@@ -66,14 +64,7 @@ void BSP_init(void) {
     EXTI->FTSR1 |= (1U << B2_PIN);                                              // configure falling edge trigger
 
     EXTI->IMR1 |= (1U << B2_PIN);                                               // configure Button B1 interrupt as falling edge
-}
 
-void BSP_ledRedOn(void) {
-    GPIOB->BSRR |= (1U << LED_RED);
-}
-
-void BSP_ledRedOff(void) {
-	GPIOB->BSRR |= (1U << (LED_RED + 16));
 }
 
 void BSP_ledGreenOn(void) {
