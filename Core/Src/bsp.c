@@ -8,6 +8,9 @@
 #define LED_BLUE 9
 #define B2_PIN 13
 
+//SEMA
+static QXSemaphore Morse_sema;
+
 
 void SysTick_Handler(void) {
     QXK_ISR_ENTRY();
@@ -97,6 +100,10 @@ void BSP_sendMorseCode(uint32_t bitmask) {
     uint32_t volatile delay_ctr;
     enum { DOT_DELAY = 150 };
 
+    //SEMA
+    QXSemaphore_wait(&Morse_sema,  /* pointer to semaphore to wait on */
+                    QXTHREAD_NO_TIMEOUT); /* timeout for waiting */
+
     for (; bitmask != 0U; bitmask <<= 1) {
         if ((bitmask & (1U << 31)) != 0U) {
             BSP_ledGreenOn();
@@ -112,6 +119,10 @@ void BSP_sendMorseCode(uint32_t bitmask) {
     for (delay_ctr = 7*DOT_DELAY;
          delay_ctr != 0U; --delay_ctr) {
     }
+
+    //SEMA
+    QXSemaphore_signal(&Morse_sema);  /* pointer to semaphore to signal */
+
 }
 
 void QF_onStartup(void){
