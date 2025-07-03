@@ -86,7 +86,11 @@ void BSP_ledBlueOn(void) {
 }
 
 void BSP_ledGreenToggle(void) {
+    QF_CRIT_STAT
+
+    QF_CRIT_ENTRY(); // enter critical section
 	GPIOB->ODR ^= (1U << LED_GREEN);
+    QF_CRIT_EXIT(); // exit critical section
 }
 
 void QF_onStartup(void){
