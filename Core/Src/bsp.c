@@ -1,17 +1,67 @@
 // Board Support Package (BSP) for the EK-TM4C123GXL board
+#include "ucos_ii.h"
+#include "qassert.h"
 #include "bsp.h"
 #include "stm32l4xx_hal.h"
+#include <stdbool.h>
 
 // on-board led
 #define LED_GREEN 14
 #define LED_BLUE 9
 #define B2_PIN 13
 
+void App_TimeTickHook(void) {
+    /* state of the button debouncing, see below */
+    static struct ButtonsDebouncing {
+        uint32_t depressed;
+        uint32_t previous;
+    } buttons = { 0U, 0U };
+    uint32_t current;
+    uint32_t tmp;
+
+    /* Perform the debouncing of buttons. The algorithm for debouncing
+    * adapted from the book "Embedded Systems Dictionary" by Jack Ganssle
+    * and Michael Barr, page 71.
+    */
+    current = ~GPIOC->IDR; // read Port C with state of Button B1
+    tmp = buttons.depressed; /* save the debounced depressed buttons */
+    buttons.depressed |= (buttons.previous & current); /* set depressed */
+    buttons.depressed &= (buttons.previous | current); /* clear released */
+    buttons.previous   = current; /* update the history */
+    tmp ^= buttons.depressed;     /* changed debounced depressed */
+    if ((tmp & (1U << B2_PIN)) != 0U) { // debounced B1 state changed?
+        if ((current & (1U << B2_PIN)) != 0U) { // is B1 depressed?
+            /* post the "button-pressed" semaphore */
+            OSSemPost(BSP_semaPress);
+        }
+        else { /* the button is released */
+            /* post the "button-release" semaphore */
+            OSSemPost(BSP_semaRelease);
         }
     }
 }
+/*..........................................................................*/
+void App_TaskIdleHook(void) {
+#ifdef NDEBUG
+    /* Put the CPU and peripherals to the low-power mode.
+    * you might need to customize the clock management for your application,
+    * see the datasheet for your particular Cortex-M3 MCU.
+    */
+    __WFI(); /* Wait-For-Interrupt */
+#endif
+}
+/*..........................................................................*/
+void App_TaskCreateHook (OS_TCB *ptcb) { (void)ptcb; }
+void App_TaskDelHook    (OS_TCB *ptcb) { (void)ptcb; }
+void App_TaskReturnHook (OS_TCB *ptcb) { (void)ptcb; }
+void App_TaskStatHook   (void)         {}
+void App_TaskSwHook     (void)         {}
+void App_TCBInitHook    (OS_TCB *ptcb) { (void)ptcb; }
+
 
 void BSP_init(void) {
+    SystemCoreClockUpdate();
+
     RCC->AHB2ENR  |= ((1U << 1) | (1U << 2));                                   // Enable clock for gpiob (bit 1) and gpioc (bit 2)
 
     GPIOB->MODER &= ~(3U << (LED_GREEN * 2));                                   // Clear mode bits for pin 14 (set as input by default)
@@ -64,9 +114,11 @@ void BSP_ledGreenToggle(void) {
 	GPIOB->ODR ^= (1U << LED_GREEN);
 }
 
+void BSP_start(void){
     SystemCoreClockUpdate();
     SysTick_Config(SystemCoreClock / BSP_TICKS_PER_SEC);
 
+    NVIC_SetPriority(SysTick_IRQn, CPU_CFG_KA_IPL_BOUNDARY);
 }
 
 void Q_onAssert(char const *module, int id) {
@@ -74,4 +126,10 @@ void Q_onAssert(char const *module, int id) {
     (void)module; /* avoid the "unused parameter" compiler warning */
     (void)id;     /* avoid the "unused parameter" compiler warning */
     NVIC_SystemReset();
+}
+
+// error-handling function called by exception handlers in the startup code
+Q_NORETURN assert_failed(char const * const module, int const id);
+Q_NORETURN assert_failed(char const * const module, int const id) {
+    Q_onAssert(module, id);
 }
