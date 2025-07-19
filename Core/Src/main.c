@@ -21,7 +21,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "qpc.h"
 #include "bsp.h"
 /* USER CODE END Includes */
 
@@ -43,7 +42,6 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-QXSemaphore SW1_sema;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -54,37 +52,10 @@ QXSemaphore SW1_sema;
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint32_t stack_blinky1[40];
-QXThread blinky1;
-void main_blinky1(QXThread * const me) {
-  while(1){
-    for(uint32_t i = 0U; i < 1900U + 1U; ++i) {
-        BSP_sendMorseCode(0xA8EEE2A0U); /* "SOS" */
-        QXThread_delay(1U); /* block for 1 tick */
+
     }
-  }
 }
 
-uint32_t stack_blinky2[40];
-QXThread blinky2;
-void main_blinky2(QXThread * const me){
-  while(1){
-    QXSemaphore_wait(&SW1_sema,  /* pointer to semaphore to wait on */
-                  QXTHREAD_NO_TIMEOUT); /* timeout for waiting */
-    for(uint32_t i = 0U; i < 3*1500U; ++i) {
-          // BSP_ledBlueOn();
-          // BSP_ledBlueOff();
-    }
-  }
-}
-
-uint32_t stack_blinky3[40];
-QXThread blinky3;
-void main_blinky3(QXThread * const me) {
-    while (1) {
-        BSP_sendMorseCode(0xE22A3800U); /* "TEST" */
-        BSP_sendMorseCode(0xE22A3800U); /* "TEST" */
-        QXThread_delay(5U);
     }
 }
 
@@ -106,7 +77,6 @@ int main(void)
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
 
   /* USER CODE BEGIN Init */
-  QF_init();
   BSP_init();
   /* USER CODE END Init */
 
@@ -124,34 +94,4 @@ int main(void)
 
   /* Infinite loop */
 
-  /* initialize the SW1_sema semaphore as binary, signaling semaphore */
-  QXSemaphore_init(&SW1_sema, /* pointer to semaphore to initialize */
-                  0U,  /* initial semaphore count (singaling semaphore) */
-                  1U); /* maximum semaphore count (binary semaphore) */
-
-  /* fabricate Cortex-M ISR stack frame for blinky1 */
-  QXThread_ctor(&blinky1, &main_blinky1, 0U);
-  QXTHREAD_START(&blinky1,
-                  5U,
-                  (void *)0, 0,
-                  stack_blinky1, sizeof(stack_blinky1),
-                  (void *)0);
-
-  /* fabricate Cortex-M ISR stack frame for blinky2 */
-  QXThread_ctor(&blinky2, &main_blinky2, 0U);
-  QXTHREAD_START(&blinky2,
-                  2U,
-                  (void *)0, 0,
-                  stack_blinky2, sizeof(stack_blinky2),
-                  (void *)0);
-
-    /* initialize and start blinky3 thread */
-    QXThread_ctor(&blinky3, &main_blinky3, 0);
-    QXTHREAD_START(&blinky3,
-                   1U, /* priority */
-                   (void *)0, 0, /* message queue (not used) */
-                   stack_blinky3, sizeof(stack_blinky3), /* stack */
-                   (void *)0); /* extra parameter (not used) */
-
-  QF_run();
 }
