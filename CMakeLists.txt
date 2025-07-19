@@ -72,12 +72,28 @@ add_library(qpc STATIC
     lib/qpc/src/qxk/qxk_mutex.c
     lib/qpc/src/qxk/qxk_sema.c
     lib/qpc/src/qxk/qxk_xthr.c
+    lib/qpc/3rd_party/uC-OS2/Source/os_core.c
+    lib/qpc/3rd_party/uC-OS2/Source/os_flag.c
+    lib/qpc/3rd_party/uC-OS2/Source/os_mbox.c
+    lib/qpc/3rd_party/uC-OS2/Source/os_mem.c
+    lib/qpc/3rd_party/uC-OS2/Source/os_mutex.c
+    lib/qpc/3rd_party/uC-OS2/Source/os_q.c
+    lib/qpc/3rd_party/uC-OS2/Source/os_sem.c
+    lib/qpc/3rd_party/uC-OS2/Source/os_task.c
+    lib/qpc/3rd_party/uC-OS2/Source/os_time.c
+    lib/qpc/3rd_party/uC-OS2/Source/os_tmr.c
+    lib/qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/os_cpu_c.c
+    lib/qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/GNU/os_cpu_a.s
+    lib/qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/GNU/os_dbg.c
 )
 
 target_include_directories(qpc PUBLIC
     ${CMAKE_SOURCE_DIR}/lib/qpc/include
     ${CMAKE_SOURCE_DIR}/lib/qpc/src
-    ${CMAKE_SOURCE_DIR}/lib/qpc/ports/arm-cm/qxk/gnu  # if using ARM-CM port
+    ${CMAKE_SOURCE_DIR}/lib/qpc/ports/arm-cm/qxk/gnu
+    ${CMAKE_SOURCE_DIR}/lib/qpc/3rd_party/uC-OS2/Cfg/Template
+    ${CMAKE_SOURCE_DIR}/lib/qpc/3rd_party/uC-OS2/Source
+    ${CMAKE_SOURCE_DIR}/lib/qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/GNU
 )
 
 
