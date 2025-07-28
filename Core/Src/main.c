@@ -58,7 +58,13 @@
 
 enum { INITIAL_BLINK_TIME = (OS_TICKS_PER_SEC / 4) };
 
-
+typedef struct {
+    Active super; /* inherit Active base class */
+    /* add private data for the AO... */
+    TimeEvent te;
+    bool isLedOn;
+    uint32_t blink_time;
+} BlinkyButton;
 
     }
 }
