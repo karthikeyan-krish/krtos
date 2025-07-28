@@ -71,6 +71,10 @@ typedef struct {
 
 }
 
+OS_STK stack_blinkyButton[100]; /* task stack */
+static Event *blinkyButton_queue[10];
+static BlinkyButton blinkyButton;
+Active *AO_BlinkyButton = &blinkyButton.super;
 
 /* USER CODE END 0 */
 
