@@ -17,7 +17,14 @@ void BSP_ledGreenOff(void);
 
 void BSP_ledGreenToggle(void);
 
-extern OS_EVENT *BSP_semaPress;   /* global semaphore handle */
-extern OS_EVENT *BSP_semaRelease; /* global semaphore handle */
+enum EventSignals {
+    BUTTON_PRESSED_SIG = USER_SIG,
+    BUTTON_RELEASED_SIG,
+    TIMEOUT_SIG,
+    /* ... */
+};
+
+/* Active objects... */
+extern Active *AO_BlinkyButton;
 
 #endif // __BSP_H__
