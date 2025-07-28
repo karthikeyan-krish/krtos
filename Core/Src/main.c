@@ -66,6 +66,42 @@ typedef struct {
     uint32_t blink_time;
 } BlinkyButton;
 
+static void BlinkyButton_dispatch(BlinkyButton * const me, Event const * const e) {
+    switch (e->sig) {
+        case INIT_SIG:
+            BSP_ledBlueOff();
+            /* intentionally fall through...*/
+        case TIMEOUT_SIG: {
+            if (!me->isLedOn) { /* LED not on */
+                BSP_ledGreenOn();
+                me->isLedOn = true;
+                TimeEvent_arm(&me->te, me->blink_time, 0U);
+            }
+            else {  /* LED is on */
+                BSP_ledGreenOff();
+                me->isLedOn = false;
+                TimeEvent_arm(&me->te, me->blink_time * 3U, 0U);
+            }
+            break;
+        }
+        case BUTTON_PRESSED_SIG: {
+            INT8U err; /* uC/OS-II error status */
+
+            BSP_ledBlueOn();
+
+            me->blink_time >>= 1; /* shorten the blink time by factor of 2 */
+            if (me->blink_time == 0U) {
+                me->blink_time = INITIAL_BLINK_TIME;
+            }
+            break;
+        }
+        case BUTTON_RELEASED_SIG: {
+            BSP_ledBlueOff();
+            break;
+        }
+        default: {
+            break;
+        }
     }
 }
 
