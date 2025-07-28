@@ -45,6 +45,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -55,7 +56,6 @@
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
 enum { INITIAL_BLINK_TIME = (OS_TICKS_PER_SEC / 4) };
 
 typedef struct {
@@ -105,6 +105,11 @@ static void BlinkyButton_dispatch(BlinkyButton * const me, Event const * const e
     }
 }
 
+void BlinkyButton_ctor(BlinkyButton * const me) {
+    Active_ctor(&me->super, (DispatchHandler)&BlinkyButton_dispatch);
+    TimeEvent_ctor(&me->te, TIMEOUT_SIG, &me->super);
+    me->isLedOn = false;
+    me->blink_time = INITIAL_BLINK_TIME;
 }
 
 OS_STK stack_blinkyButton[100]; /* task stack */
@@ -149,4 +154,18 @@ int main(void)
 
   /* Infinite loop */
 
+  /* create AO and start it */
+  BlinkyButton_ctor(&blinkyButton);
+  Active_start(AO_BlinkyButton,
+                2U,
+                blinkyButton_queue,
+                sizeof(blinkyButton_queue)/sizeof(blinkyButton_queue[0]),
+                stack_blinkyButton,
+                sizeof(stack_blinkyButton),
+                0U);
+
+  BSP_start(); /* configure and start the interrupts */
+
+  OSStart(); /* start the uC/OS-II scheduler... */
+  return 0; /* NOTE: the scheduler does NOT return */
 }
