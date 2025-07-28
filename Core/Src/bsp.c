@@ -1,5 +1,5 @@
 // Board Support Package (BSP) for the EK-TM4C123GXL board
-#include "ucos_ii.h"
+#include "uc_ao.h"
 #include "qassert.h"
 #include "bsp.h"
 #include "stm32l4xx_hal.h"
@@ -34,11 +34,13 @@ void App_TimeTickHook(void) {
     if ((tmp & (1U << B2_PIN)) != 0U) { // debounced B1 state changed?
         if ((current & (1U << B2_PIN)) != 0U) { // is B1 depressed?
             /* post the "button-pressed" semaphore */
-            OSSemPost(BSP_semaPress);
+            static Event const buttonPressedEvt = {BUTTON_PRESSED_SIG};
+            Active_post(AO_BlinkyButton, &buttonPressedEvt);
         }
         else { /* the button is released */
             /* post the "button-release" semaphore */
-            OSSemPost(BSP_semaRelease);
+            static Event const buttonReleasedEvt = {BUTTON_RELEASED_SIG};
+            Active_post(AO_BlinkyButton, &buttonReleasedEvt);
         }
     }
 }
