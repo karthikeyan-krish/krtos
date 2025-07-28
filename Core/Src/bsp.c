@@ -19,6 +19,8 @@ void App_TimeTickHook(void) {
     uint32_t current;
     uint32_t tmp;
 
+    TimeEvent_tick(); /* process all uC/AO time events */
+
     /* Perform the debouncing of buttons. The algorithm for debouncing
     * adapted from the book "Embedded Systems Dictionary" by Jack Ganssle
     * and Michael Barr, page 71.
