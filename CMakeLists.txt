@@ -85,15 +85,16 @@ add_library(qpc STATIC
     lib/qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/os_cpu_c.c
     lib/qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/GNU/os_cpu_a.s
     lib/qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/GNU/os_dbg.c
+    lib_modified/uc_ao.c
 )
 
 target_include_directories(qpc PUBLIC
     ${CMAKE_SOURCE_DIR}/lib/qpc/include
     ${CMAKE_SOURCE_DIR}/lib/qpc/src
     ${CMAKE_SOURCE_DIR}/lib/qpc/ports/arm-cm/qxk/gnu
-    ${CMAKE_SOURCE_DIR}/lib_modified
     ${CMAKE_SOURCE_DIR}/lib/qpc/3rd_party/uC-OS2/Source
     ${CMAKE_SOURCE_DIR}/lib/qpc/3rd_party/uC-OS2/Ports/ARM-Cortex-M/ARMv7-M/GNU
+    ${CMAKE_SOURCE_DIR}/lib_modified
 )
 
 
